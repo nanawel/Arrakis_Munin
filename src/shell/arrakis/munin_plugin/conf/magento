@@ -1,0 +1,9 @@
+[magento_*]
+user www-data
+#user http
+env.mageinstance1 /var/www/html/magento
+env.mageinstance1_label My Magento Shop
+env.mageinstance1_name my_magento_shop
+#env.mageinstance2 /srv/http/magento
+#env.mageinstance2_label My Other Magento Shop
+#env.mageinstance2_name my_other_magento_shop

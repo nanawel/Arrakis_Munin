@@ -1,0 +1,12 @@
+<config>
+	<modules>
+		<Arrakis_Munin>
+			<active>true</active>
+			<codePool>community</codePool>
+            <depends>
+                <Mage_Catalog />
+                <Mage_Sales />
+            </depends>
+		</Arrakis_Munin>
+	</modules>
+</config>

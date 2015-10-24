@@ -1,0 +1,89 @@
+<config>
+    <modules>
+        <Arrakis_Munin>
+            <version>0.1.0</version>
+        </Arrakis_Munin>
+    </modules>
+    <global>
+        <helpers>
+            <arrakis_munin>
+                <class>Arrakis_Munin_Helper</class>
+            </arrakis_munin>
+        </helpers>
+        <models>
+            <arrakis_munin>
+                <class>Arrakis_Munin_Model</class>
+                <resourceModel>arrakis_munin_resource</resourceModel>
+            </arrakis_munin>
+            <arrakis_munin_resource>
+                <class>Arrakis_Munin_Model_Resource</class>
+            </arrakis_munin_resource>
+        </models>
+<!-- 		<resources> -->
+<!-- 			<arrakis_munin_setup> -->
+<!-- 				<setup> -->
+<!-- 					<module>Arrakis_Munin</module> -->
+<!-- 					<class>Arrakis_Munin_Model_Resource_Setup</class> -->
+<!-- 				</setup> -->
+<!-- 			</arrakis_munin_setup> -->
+<!-- 		</resources> -->
+    </global>
+<!--     <frontend> -->
+<!--         <routers> -->
+<!--             <cms> -->
+<!--                 <args> -->
+<!--                     <modules> -->
+<!--                         <arrakis_munin before="Mage_Cms">Arrakis_Munin</arrakis_munin> -->
+<!--                     </modules> -->
+<!--                 </args> -->
+<!--             </cms> -->
+<!--         </routers> -->
+<!--     </frontend> -->
+<!--     <admin> -->
+<!--         <routers> -->
+<!--             <adminhtml> -->
+<!--                 <args> -->
+<!--                     <modules> -->
+<!--                         <arrakis_munin before="Mage_Adminhtml">Arrakis_Munin_Adminhtml</arrakis_munin> -->
+<!--                     </modules> -->
+<!--                 </args> -->
+<!--             </adminhtml> -->
+<!--         </routers> -->
+<!--     </admin> -->
+<!--     <adminhtml> -->
+<!--         <translate> -->
+<!--             <modules> -->
+<!--                 <Arrakis_Munin> -->
+<!--                     <files> -->
+<!--                         <default>Arrakis_Munin.csv</default> -->
+<!--                         <adminhtml>Mage_Adminhtml.csv</adminhtml> -->
+<!--                     </files> -->
+<!--                 </Arrakis_Munin> -->
+<!--             </modules> -->
+<!--         </translate> -->
+<!--     </adminhtml> -->
+    <arrakis_munin>
+        <monitors>
+            <catalog>
+                <enabled>1</enabled>
+                <class>arrakis_munin/monitor_catalog</class>
+                <sort_order>10</sort_order>
+            </catalog>
+            <db>
+                <enabled>1</enabled>
+                <class>arrakis_munin/monitor_db</class>
+                <sort_order>20</sort_order>
+            </db>
+            <log>
+                <enabled>1</enabled>
+                <class>arrakis_munin/monitor_log</class>
+                <sort_order>30</sort_order>
+            </log>
+            <sales>
+                <enabled>1</enabled>
+                <class>arrakis_munin/monitor_sales</class>
+                <sort_order>40</sort_order>
+            </sales>
+        </monitors>
+    </arrakis_munin>
+</config>

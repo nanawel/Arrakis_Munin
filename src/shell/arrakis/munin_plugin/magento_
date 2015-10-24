@@ -1,0 +1,124 @@
+#!/bin/sh
+#
+# Copyright 2015 Anael Ollier
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+: <<=cut
+
+=head1 NAME
+
+magento - Plugin to monitor Magento instances.
+
+=head1 APPLICABLE SYSTEMS
+
+All Linux systems
+
+=head1 CONFIGURATION
+
+The following is a typical configuration
+
+  [magento_*]
+    user www-data
+    env.mageinstance1 /var/www/magento
+    env.mageinstance1_name eshop2000
+    env.mageinstance1_label E-Shop 2000
+    env.mageinstance1_monitors all
+
+=head1 MAGIC MARKERS
+
+  #%# family=auto
+  #%# capabilities=autoconf suggest
+
+
+=head1 VERSION
+
+  $Id$
+
+=head1 AUTHOR
+
+Anaël Ollier
+
+=head1 LICENSE
+
+GPLv2
+
+=cut
+
+
+. $MUNIN_LIBDIR/plugins/plugin.sh
+
+PHP_BIN=$(which php)
+MAGE_SHELL_SCRIPT=shell/arrakis/munin.php
+
+MONITOR=$(echo ${0##*/} | awk -F '_' "{ print \$2 }")
+GRAPH=$(echo ${0##*/} | awk -F '_' "{ print \$3 }")
+
+if [ "$1" != "suggest" ] && [ "$1" != "autoconf" ] && ([ -z $MONITOR ] || [ -z $GRAPH ]); then
+    echo "[ERROR] Missing category and graph. You must use a link in the following format: magento_category_graph. (Try \"suggest\")"
+    exit 1
+fi
+
+declare -a magePaths
+mageInstances=$(env | awk -F "=" "/^mageinstance[0-9]+=/ { print \"magePaths[\"substr(\$1,13)\"]='\"\$2\"'; \n\" }")
+eval $mageInstances
+
+function getInstanceConfig {
+    instanceNum=$1
+    configPrefix="mageinstance${instanceNum}_"
+    env | awk -F "=" "/^$configPrefix.*=/ { print substr(\$1,length(\"$configPrefix\")+1)\"='\"\$2\"' \" }"
+}
+
+if [ "$1" = "autoconf" ]; then
+    if [ -x $PHP_BIN ] && [ ${#magePaths[@]} -gt 0 ]; then
+	echo yes
+	exit 0
+    else
+	echo no
+	exit 0
+    fi
+fi
+
+if [ "$1" = "suggest" ]; then
+    for ((i = 1 ; i <= ${#magePaths[@]} ; i++)); do
+	if [ -r ${magePaths[$i]}/$MAGE_SHELL_SCRIPT ]; then
+	    instanceConfig=$(getInstanceConfig $i)
+	    $PHP_BIN -f ${magePaths[$i]}/$MAGE_SHELL_SCRIPT -- --instance $i --suggest --instanceConfig "$instanceConfig"
+	else
+	    echo "[ERROR] ${magePaths[$i]}/$MAGE_SHELL_SCRIPT does not exist or is not readable" >&2
+	fi
+    done
+    exit 0
+fi
+
+if [ "$1" = "config" ]; then
+    for ((i = 1 ; i <= ${#magePaths[@]} ; i++)); do
+	if [ -r ${magePaths[$i]}/$MAGE_SHELL_SCRIPT ]; then
+	    instanceConfig=$(getInstanceConfig $i)
+	    $PHP_BIN -f ${magePaths[$i]}/$MAGE_SHELL_SCRIPT -- --instance $i --config --monitor $MONITOR --graph $GRAPH --instanceConfig "$instanceConfig"
+	else
+	    echo "[ERROR] ${magePaths[$i]}/$MAGE_SHELL_SCRIPT does not exist or is not readable" >&2
+	fi
+    done
+    exit 0
+fi
+
+for ((i = 1 ; i <= ${#magePaths[@]} ; i++)); do
+    if [ -r ${magePaths[$i]}/$MAGE_SHELL_SCRIPT ]; then
+	instanceConfig=$(getInstanceConfig $i)
+	$PHP_BIN -f ${magePaths[$i]}/$MAGE_SHELL_SCRIPT -- --instance $i --values --monitor $MONITOR --graph $GRAPH --instanceConfig "$instanceConfig"
+    else
+	echo "[ERROR] ${magePaths[$i]}/$MAGE_SHELL_SCRIPT does not exist or is not readable" >&2
+    fi
+done
+
+exit 0
